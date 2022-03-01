@@ -25,13 +25,23 @@ def print_table(table):
     
 
 # Init balls & holes
-ballA = Ball(np.matrix([[10, 10]]))
+ballA = Ball(np.matrix([[10], [10]]))
 ballB = []
 for i in range(1, 2):
-    ballB.append(Ball(np.matrix([[50+10*i, 50+10*i]])))
+    ballB.append(Ball(np.matrix([[50+10*i], [50+10*i]])))
 
-hole = [Hole(np.matrix([[0, 0]])), Hole(np.matrix([[100, 0]])), Hole(np.matrix([[200, 0]]))
-        , Hole(np.matrix([[0, 100]])), Hole(np.matrix([[100, 100]])), Hole(np.matrix([[200, 100]]))]
+hole = [Hole(np.matrix([[0], [0]])), Hole(np.matrix([[100], [0]])), Hole(np.matrix([[200], [0]]))
+        , Hole(np.matrix([[0], [100]])), Hole(np.matrix([[100], [100]])), Hole(np.matrix([[200], [100]]))]
 
-table = Table(np.matrix([[0, 0]]), ballA, ballB, hole)
-print_table(table)
+table = Table(np.matrix([[3], [3]]), np.matrix([[0], [0]]), ballA, ballB, hole)
+print(table.origin)
+# print_table(table)
+for tball in table.tballs:
+    print(tball.hit_pos)
+    
+mtable = table.mirror_table(np.matrix([[4], [4]]))
+print("MTABLE \n\n")
+print(mtable.origin)
+print(mtable.index_rr)
+for tball in mtable.tballs:
+    print(tball.hit_pos)

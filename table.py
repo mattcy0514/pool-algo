@@ -1,9 +1,12 @@
+from __future__ import annotations
 import numpy as np 
 import math
 import config
-from sprite import Ball, Hole
+
+import copy
 
 radius = config.radius
+conf = config.conf
 
 class Table:
     length = 100
@@ -13,7 +16,8 @@ class Table:
     tballs = None
     holes = None
     
-    def __init__(self, origin:np.matrix, mball, tballs, holes):
+    def __init__(self, index_rr:np.matrix, origin:np.matrix, mball, tballs, holes):
+        self.index_rr = index_rr
         self.origin = origin
         self.mball = mball
         self.tballs = tballs
@@ -28,14 +32,50 @@ class Table:
                         
     def hit_pos(self, m, t, r):
         diff = t - m
-        if diff[0, 0] != 0:
-            theta = math.atan(abs(diff[0, 1] / diff[0, 0]))
+        if diff[0,0] != 0:
+            theta = math.atan(abs(diff[1,0] / diff[0,0]))
         else:
             theta = math.pi / 2
-        x_coef = -1 if diff[0, 0] > 0 else 1
-        y_coef = -1 if diff[0, 1] > 0 else 1
+        x_coef = -1 if diff[0,0] > 0 else 1
+        y_coef = -1 if diff[1,0] > 0 else 1
         x = m[0,0] + x_coef*2*r*math.cos(theta)
-        y = m[0,1] + y_coef*2*r*math.sin(theta)
-        pos = np.array((x, y))
+        y = m[1,0] + y_coef*2*r*math.sin(theta)
+        pos = np.matrix([[x], [y]])
         return pos
     
+    def mirror_table(self, index_ij:np.matrix):
+        mtable = copy.deepcopy(self)
+        mtable.index_rr = index_ij
+        # origin transform
+        mtable.origin = self.mirror_transform(mtable.origin, index_ij)
+        # mball transform
+        mtable.mball.pos = self.mirror_transform(mtable.mball.pos, index_ij)
+            
+        # tballs transform
+        for i in range(len(mtable.tballs)):
+            mtable.tballs[i].pos = self.mirror_transform(mtable.tballs[i].pos, index_ij)
+            for j in range(len(mtable.tballs[i].hit_pos)):
+                mtable.tballs[i].hit_pos[j] = self.mirror_transform(mtable.tballs[i].hit_pos[j], index_ij)
+        # holes transform
+        for i in range(len(mtable.holes)):
+            mtable.holes[i].pos = self.mirror_transform(mtable.holes[i].pos, index_ij)
+        
+        return mtable    
+    
+    def mirror_transform(self, pos:np.matrix, index_ij:np.matrix):
+        x_reflect = np.matrix([[1, 0], [0, -1]])
+        y_reflect = np.matrix([[-1, 0], [0, 1]])
+
+        index_diff = index_ij - self.index_rr
+
+        cx = abs(index_diff[1,0] % 2)
+        cy = abs(index_diff[0,0] % 2)
+        
+        if cx:
+            index_diff = index_diff + np.matrix([[0], [1]])
+        if cy:
+            index_diff = index_diff + np.matrix([[1], [0]])
+        
+        comp_mat = x_reflect ** cx * y_reflect ** cy
+
+        return comp_mat * pos + conf * index_diff
