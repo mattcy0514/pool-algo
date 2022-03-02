@@ -44,21 +44,30 @@ class Table:
         return pos
     
     def mirror_table(self, index_ij:np.matrix):
+        # First, we need to clone object of itself
+        # That is, deepcopy of self
         mtable = copy.deepcopy(self)
+
         mtable.index_rr = index_ij
+        
         # origin transform
         mtable.origin = self.mirror_transform(mtable.origin, index_ij)
         # mball transform
         mtable.mball.pos = self.mirror_transform(mtable.mball.pos, index_ij)
-            
-        # tballs transform
+        
         for i in range(len(mtable.tballs)):
+            # idk why deepcopy does not work with list in tballs?
+            # So, we need to manually deepcopy hit_pos again here.
+            mtable.tballs[i].hit_pos = copy.deepcopy(self.tballs[i].hit_pos)
+            # tballs transform
             mtable.tballs[i].pos = self.mirror_transform(mtable.tballs[i].pos, index_ij)
             for j in range(len(mtable.tballs[i].hit_pos)):
+                # hit_pos transform
                 mtable.tballs[i].hit_pos[j] = self.mirror_transform(mtable.tballs[i].hit_pos[j], index_ij)
         # holes transform
         for i in range(len(mtable.holes)):
             mtable.holes[i].pos = self.mirror_transform(mtable.holes[i].pos, index_ij)
+            # print(mtable.holes[i].pos)
         
         return mtable    
     
