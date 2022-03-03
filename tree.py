@@ -30,9 +30,12 @@ class TreeNode:
                 child_node = TreeNode(child_index, current_node, [], level+1)
                 # print(child_node.index)
                 q.append(child_node)
-                
+                current_node.child.append(child_node)
+                                
             if level == cushion_amt:
                 break
         return root_node
             
-root_node = TreeNode.find_mtable_tree(3)
+# root_node = TreeNode.find_mtable_tree(3)
+# for child in root_node.child:
+    # print(child.index)

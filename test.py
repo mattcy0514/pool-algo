@@ -4,14 +4,19 @@ import numpy as np
 from table import Table
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+import tree
+import time
 
+time_start = round(time.time() * 1000)
 fig, ax = plt.subplots()
 
-ax.set_xlim((-600, 400))
-ax.set_ylim((-600, 400))
+ax.set_xlim((-600, 800))
+ax.set_ylim((-600, 800))
 
 
-def print_table(tables):
+def print_table(root, tables):
+    
+    ball_start = np.array((root.mball.pos[0,0], root.mball.pos[1,0]))
     for table in tables:
         line_x, line_y = (table.holes[0].pos[0,0], table.holes[2].pos[0,0]), (table.holes[0].pos[1,0], table.holes[2].pos[1,0])
         line = Line2D(line_x, line_y)
@@ -29,16 +34,19 @@ def print_table(tables):
         line = Line2D(line_x, line_y)
         ax.add_line(line)
         
-        
         ball = plt.Circle(np.array((table.mball.pos[0,0], table.mball.pos[1,0])), 8, color='blue')
+        
         ax.add_patch(ball)
         for tball in table.tballs:
             circle = plt.Circle(np.array((tball.pos[0,0], tball.pos[1,0])), 8, color='green')
             ax.add_patch(circle)
             for pos in tball.hit_pos:
                 # print(pos)
-                hit = plt.Circle(np.array((pos[0,0], pos[1,0])), 0.5, color='red')
+                ball_end = np.array((pos[0,0], pos[1,0]))
+                hit = plt.Circle(ball_end, 0.5, color='red')
                 ax.add_patch(hit)
+                line = Line2D((ball_start[0], ball_end[0]), (ball_start[1], ball_end[1]), linewidth=0.05)
+                ax.add_line(line)
             
         for hole in table.holes:
             # print(hole.pos)
@@ -51,7 +59,7 @@ def print_table(tables):
 # Init balls & holes
 mball = Ball(np.matrix([[150], [75]]))
 tballs = []
-for i in range(0, 9):
+for i in range(0, 5):
     tballs.append(Ball(np.matrix([[random.randint(10, 120)+10*i], [random.randint(10, 120)+10*i]])))
 
 hole = [Hole(np.matrix([[0], [0]])), Hole(np.matrix([[100], [0]])), Hole(np.matrix([[200], [0]]))
@@ -59,10 +67,29 @@ hole = [Hole(np.matrix([[0], [0]])), Hole(np.matrix([[100], [0]])), Hole(np.matr
 
 table = Table(np.matrix([[3], [3]]), np.matrix([[0], [0]]), mball, tballs, hole)
 
-mtable = []
-for i in range(0, 5):
-    for j in range(0, 5):
-        t = table.mirror_table(np.matrix([[i], [j]]))
-        mtable.append(t)
-        
-print_table(mtable)
+
+# mtable = []
+# for i in range(1, 6):
+#     for j in range(1, 6):
+#         t = table.mirror_table(np.matrix([[i], [j]]))
+#         mtable.append(t)
+
+q = []
+mtable = []        
+tree_node = tree.TreeNode.find_mtable_tree(3)
+q.append(tree_node)
+while len(q) > 0:
+    node = q.pop(0)
+    print(node.index)
+    t = table.mirror_table(np.matrix([[node.index[0]], [node.index[1]]]))
+    mtable.append(t)
+    for child in node.child:
+        q.append(child)
+time_mid = round(time.time() * 1000)
+print(time_mid - time_start)
+
+print_table(table, mtable)
+
+time_end = round(time.time() * 1000)
+
+print(time_end - time_mid)
