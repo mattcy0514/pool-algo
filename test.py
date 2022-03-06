@@ -1,18 +1,20 @@
 from sprite import Ball, Hole
 import random
+import config
 import numpy as np
 from table import Table
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import tree
 import time
-
 time_start = round(time.time() * 1000)
 fig, ax = plt.subplots()
+# ax.set_xlim((-600, 800))
+# ax.set_ylim((-600, 800))
+ax.set_xlim((-200, 200))
+ax.set_ylim((-200, 200))
 
-ax.set_xlim((-600, 800))
-ax.set_ylim((-600, 800))
-
+radius = config.radius
 
 def print_table(root, tables):
     
@@ -34,11 +36,11 @@ def print_table(root, tables):
         line = Line2D(line_x, line_y)
         ax.add_line(line)
         
-        ball = plt.Circle(np.array((table.mball.pos[0,0], table.mball.pos[1,0])), 8, color='blue')
+        ball = plt.Circle(np.array((table.mball.pos[0,0], table.mball.pos[1,0])), radius, color='blue')
         
         ax.add_patch(ball)
         for tball in table.tballs:
-            circle = plt.Circle(np.array((tball.pos[0,0], tball.pos[1,0])), 8, color='green')
+            circle = plt.Circle(np.array((tball.pos[0,0], tball.pos[1,0])), radius, color='green')
             ax.add_patch(circle)
             for pos in tball.hit_pos:
                 # print(pos)
@@ -50,10 +52,10 @@ def print_table(root, tables):
             
         for hole in table.holes:
             # print(hole.pos)
-            hole = plt.Circle(np.array((hole.pos[0,0], hole.pos[1,0])), 8, color='black')
+            hole = plt.Circle(np.array((hole.pos[0,0], hole.pos[1,0])), radius, color='black')
             ax.add_patch(hole)
                     
-    fig.savefig('plotcircles.png')
+    fig.savefig('plotcircles.png', dpi=1200)
     
 
 # Init balls & holes
@@ -68,23 +70,23 @@ hole = [Hole(np.matrix([[0], [0]])), Hole(np.matrix([[100], [0]])), Hole(np.matr
 table = Table(np.matrix([[3], [3]]), np.matrix([[0], [0]]), mball, tballs, hole)
 
 
-# mtable = []
-# for i in range(1, 6):
-#     for j in range(1, 6):
-#         t = table.mirror_table(np.matrix([[i], [j]]))
-#         mtable.append(t)
+mtable = []
+for i in range(3, 4):
+    for j in range(2, 4):
+        t = table.mirror_table(np.matrix([[i], [j]]))
+        mtable.append(t)
 
-q = []
-mtable = []        
-tree_node = tree.TreeNode.find_mtable_tree(3)
-q.append(tree_node)
-while len(q) > 0:
-    node = q.pop(0)
-    print(node.index)
-    t = table.mirror_table(np.matrix([[node.index[0]], [node.index[1]]]))
-    mtable.append(t)
-    for child in node.child:
-        q.append(child)
+# q = []
+# mtable = []        
+# tree_node = tree.TreeNode.find_mtable_tree(3)
+# q.append(tree_node)
+# while len(q) > 0:
+#     node = q.pop(0)
+#     print(node.index)
+#     t = table.mirror_table(np.matrix([[node.index[0]], [node.index[1]]]))
+#     mtable.append(t)
+#     for child in node.child:
+#         q.append(child)
 time_mid = round(time.time() * 1000)
 print(time_mid - time_start)
 
