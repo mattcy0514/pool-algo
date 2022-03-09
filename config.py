@@ -1,4 +1,7 @@
+# Configuration of this project
+
 import numpy as np
+
 radius = 5
 length = 200
 width = 200

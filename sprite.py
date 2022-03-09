@@ -1,3 +1,5 @@
+# All objects on pool table
+
 import numpy as np
 
 class Sprite:
@@ -5,9 +7,9 @@ class Sprite:
         self.pos = pos
 
 class Ball(Sprite):
-    hit_pos = []
     def __init__(self, pos:np.matrix, ball=None):
         super().__init__(pos)
+        self.hit_pos = []
     
     def append_hit_pos(self, pos:np.matrix):
         self.hit_pos.append(pos)
