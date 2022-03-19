@@ -1,5 +1,4 @@
-# Tree structure of indices for generating mirror table
-
+# Bad implementation of tree structure, getting more time complexity
 class TreeNode:
     def __init__(self, index, child, level):
         self.index = index

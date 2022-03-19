@@ -1,23 +1,22 @@
-# Bad implementation of tree structure, getting more time complexity
+# Tree structure of indices for generating mirror table
+# Good implementation of tree structure, getting less time complexity
+from __future__ import annotations
 
-class TreeNode:
-    def __init__(self, index, child, level):
-        self.index = index
-        self.child = child
-        self.level = level
+class Tree:
+    def __init__(self, root:TreeNode):
+        self.root = root
     
     @staticmethod
     def find_mtable_tree(cushion_amt):
-        root_node = TreeNode((cushion_amt, cushion_amt), [], 0)
-
+        tree = Tree(TreeNode((cushion_amt, cushion_amt), [], 0))
+        root = tree.root
         # q is for traversing mtable tree in order
         q = []
-        q.append(root_node)
+        q.append(root)
         
         # appeared_set is for detecting repeated indices
-        appeared_set = {root_node.index}
+        appeared_indices_set = {root.index}
         
-        count = 0
         while len(q) > 0:
             current_node = q.pop(0)
             current_index = current_node.index
@@ -30,12 +29,12 @@ class TreeNode:
             to_be_removed_list = []
             for child_index in child_index_list:
                 # print(child_index)
-                if child_index in appeared_set:
+                if child_index in appeared_indices_set:
                     # we cannot remove appeared child in this section
                     # it may be wild when a loop ends
                     to_be_removed_list.append(child_index)
                 else:
-                    appeared_set.add(child_index)
+                    appeared_indices_set.add(child_index)
 
             for removed in to_be_removed_list:
                 child_index_list.remove(removed)
@@ -49,9 +48,15 @@ class TreeNode:
                 child_node = TreeNode(child_index, [], child_level)
                 current_node.child.append(child_node)
                 q.append(child_node)
-            count = count + 1
-        return root_node
+            
+        return tree
 
+class TreeNode:
+    def __init__(self, index, child, level):
+        self.index = index
+        self.child = child
+        self.level = level
+    
 # node = TreeNode.find_mtable_tree(5)
 # q = []
 # q.append(node)
