@@ -6,6 +6,7 @@
 from __future__ import annotations
 import copy
 import numpy as np 
+import math
 
 import config
 import algo
@@ -27,6 +28,33 @@ class Table:
         self.mball = mball
         self.tballs = tballs
         self.holes = holes
+        self.set_real_hit_holes_pos(holes)
+
+    def set_real_hit_holes_pos(self, holes):
+        real_hit_holes_pos = []
+        for hole in holes:
+            hole_pos = hole.pos
+            if hole_pos[1,0] == 0:
+                y_offset = 1
+            elif hole_pos[1,0] == config.width:
+                y_offset = -1
+            
+            if hole_pos[0,0] == 0:
+                x_offset = 1
+            elif hole_pos[0,0] == config.length:
+                x_offset = -1
+            else:
+                x_offset = 0
+
+            angle = math.pi/4 if abs(x_offset) else math.pi/2
+            x_offset = x_offset * (config.radius) * math.cos(angle)
+            y_offset = y_offset * (config.radius) * math.sin(angle)
+            offset = np.matrix([[x_offset], [y_offset]])
+            hole_pos = hole_pos + offset
+            real_hit_holes_pos.append(hole_pos)
+
+        self.real_hit_holes_pos = real_hit_holes_pos
+            
 
     def mirror_table(self, index_ij:np.matrix):
         # First, we need to clone object of itself
@@ -50,6 +78,8 @@ class Table:
         for i in range(len(mtable.holes)):
             mtable.holes[i].pos = algo.mirror_transform(mtable.holes[i].pos, self.index_rr, index_ij)
             # print(mtable.holes[i].pos)
+        for i in range(len(mtable.real_hit_holes_pos)):
+            mtable.real_hit_holes_pos[i] = algo.mirror_transform(mtable.real_hit_holes_pos[i], self.index_rr, index_ij)
         
         return mtable    
    

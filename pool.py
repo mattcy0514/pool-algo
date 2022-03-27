@@ -13,8 +13,8 @@ import path
 fig, ax = plt.subplots()
 # ax.set_xlim((-600, 800))
 # ax.set_ylim((-600, 800))
-ax.set_xlim((-600, 800))
-ax.set_ylim((-600, 800))
+ax.set_xlim((0, 200))
+ax.set_ylim((0, 200))
 
 radius = config.radius
 length = config.length
@@ -24,7 +24,8 @@ width = config.width
 mball = Ball(np.matrix([[150], [75]]))
 tballs = []
 
-cushion_amt = int(input())
+# cushion_amt = int(input())
+cushion_amt = 3
 
 # Init balls & holes
 mball = Ball(np.matrix([[150], [75]]))
@@ -33,25 +34,68 @@ holes = [Hole(np.matrix([[0], [0]])), Hole(np.matrix([[length/2], [0]])), Hole(n
         , Hole(np.matrix([[0], [width]])), Hole(np.matrix([[length/2], [width]])), Hole(np.matrix([[length], [width]]))]
 origin = np.matrix([[0], [0]])
 
-for i in range(0, 1):
-    tballs.append(Ball(np.matrix([[random.randint(50, 80)+10*i], [random.randint(50, 80)+10*i]])))
+mball_circle = plt.Circle([mball.pos[0,0], mball.pos[1,0]], radius=radius, color="g")
+ax.add_patch(mball_circle)
+for i in range(0, 3):
+    tballs.append(Ball(np.matrix([[random.randint(0, 120)+10*i], [random.randint(0, 120)+10*i]])))
+    tball = plt.Circle([tballs[i].pos[0,0], tballs[i].pos[1,0]], radius=radius, color="b")
+    ax.add_patch(tball)
+
+for hole in holes:
+    hole = plt.Circle([hole.pos[0,0], hole.pos[1,0]], radius=radius, color="black")
+    ax.add_patch(hole)
 
 table = Table(np.matrix([[cushion_amt], [cushion_amt]]), origin, mball, tballs, holes)
 
-path = path.find_paths(table, table.mirror_table(np.matrix([[4], [5]])), "mball")
-while path.first != None:
-    print(path.first.no)
-    path_node = path.first
-    connected_node = path_node.connected_ll.first
-    while connected_node.next != None:
-        if connected_node.type == 'm':
-            color = "g"
-        else:
-            color = "b"
-        line = Line2D([connected_node.pos[0,0], connected_node.next.pos[0,0]], [connected_node.pos[1,0], connected_node.next.pos[1,0]], linewidth=0.5, color=color)
+cushion_type_list = ["mball", "tball"]
+print("cushion type: mball or tball:")
+cushion_type = cushion_type_list[int(input())]
+# path_to_json = path.path_to_json
+paths = path.find_all_paths(table, table.mirror_table(np.matrix([[int(input())], [int(input())]])), cushion_type)
+# path_to_json(path)
+path_node = paths.first
+while path_node != None:
+    print(path_node.no)
+    # path.is_angle_valid(path_node.connection_list)
+    if not path.is_connection_valid(path_node.connection_list, table):
+        paths.remove(path_node)
+        print("removed", path_node.no)
+        # paths.remove(path_node)
+        
+    
+    # if not path.is_connection_valid(path_node.connection_list, table):
+        # paths.remove(path_node)
+    path_node = path_node.next
+
+print("paths.first", paths.first)
+path_node = paths.first
+print("after validation")
+while path_node != None:
+    print(path_node.no)
+    path_node = path_node.next
+
+path_node = paths.first
+# paths.traverse()
+while path_node != None:
+    # print(path_node.no)
+    connection_list = path_node.connection_list
+    color_changed = False
+    for index in range(len(connection_list)-1):
+        connection_node = connection_list[index]
+        next_node = connection_list[index+1]
+        # if connection_node.type == next_node.type:
+        if not color_changed:
+            color = np.random.rand(3,)
+            color_changed = True
+        index_rr = table.index_rr
+        # current_pos = algo.mirror_transform(connection_node.pos, index_rr, inverse=True)
+        # next_pos = algo.mirror_transform(next_node.pos, index_rr, inverse=True)
+        current_pos = connection_node.pos
+        next_pos = next_node.pos
+        line = Line2D([current_pos[0,0], next_pos[0,0]], [current_pos[1,0], next_pos[1,0]], linewidth=0.5, color=color)
+        ax.text((current_pos[0,0] + next_pos[0,0]) / 2, (current_pos[1,0] + next_pos[1,0]) / 2, path_node.no, fontsize=3)
         ax.add_line(line)
-        connected_node = connected_node.next
-    path.first = path.first.next
+    path_node = path_node.next
     print("\n")
 
 plt.show()

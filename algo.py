@@ -1,6 +1,6 @@
 # A set of different algorithms used in other files
 
-from math import ceil, floor
+from math import ceil, dist, floor
 import math
 import numpy as np
 
@@ -61,7 +61,6 @@ def multiples_between_interval(start, end, multiple):
     mx = ceil(mx/multiple) * multiple
     return list(range(mn, mx, multiple))
 
-
 def point_between_two_points(x, p1, p2, inverse=False):
     slope = (p2[1,0]-p1[1,0]) / (p2[0,0]-p1[0,0])
     if not inverse:
@@ -69,8 +68,40 @@ def point_between_two_points(x, p1, p2, inverse=False):
     else:
         return np.matrix([[(x-p1[1,0]) / slope + p1[0,0]], [x]])
 
+def angle_between_two_vectors(p1, p2):
+    return math.acos(dot(p1, p2) / (norm(p1) * norm(p2)))
 
-print(mirror_transform(np.matrix([[200], [600]]), index_rr=np.matrix([[3], [3]]), inverse=True))
+def distance_from_point_to_segment(p, p1, p2):
+    ab_vect = p2 - p1
+    ap_vect = p - p1
+    ac_proj_vect = dot(ap_vect, ab_vect) * ab_vect / (norm(ab_vect) ** 2)
+    r = dot(ab_vect, ap_vect) / (norm(ab_vect) ** 2)
+    if r <= 0:
+        return norm(ap_vect)
+    elif r >= 1:
+        bp_vect = p - p2
+        return norm(bp_vect)
+    else:
+        cp_vect = ap_vect - ac_proj_vect
+        return norm(cp_vect)
+
+def distance_from_point_to_line(p, p1, p2):
+    slope = (p2[1,0]-p1[1,0]) / (p2[0,0]-p1[0,0])
+    b = -slope * p1[0,0] + p1[1,0]
+    x, y = p[0,0], p[1,0]
+    return abs((slope * x - y + b) / ((slope ** 2 + 1) ** (1/2)))
+
+def norm(p):
+    return (p[0,0] ** 2 + p[1,0] ** 2) ** (1/2)
+
+def dot(p1, p2):
+    return (p1.T * p2)[0,0]
+
+print(distance_from_point_to_segment(np.matrix([[-10], [-10]]), np.matrix([[0], [0]]), np.matrix([[100], [100]])))
+# print(angle_between_two_vectors(np.matrix([[2], [0]]), np.matrix([[-2], [2]])))
+# print(is_collided_to_segment(np.matrix([[116], [114]]), np.matrix([[0], [25.34]]), np.matrix([[117], [104]]), 5))
+# print(distance_from_point_to_line(np.matrix([[0], [0]]), np.matrix([[0], [0]]), np.matrix([[100], [0]])))
+# print(mirror_transform(np.matrix([[200], [600]]), index_rr=np.matrix([[3], [3]]), inverse=True))
 # p1 = np.matrix([[4], [4]])
 # p2 = np.matrix([[4.001], [5]])
 # print(point_between_two_points(5, p1, p2, True))
