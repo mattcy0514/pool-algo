@@ -295,4 +295,3 @@ def calculate_moving_nodes(start, end, length, width, type):
 def append_to_list(target_list, src_list):
     for src in src_list:
         target_list.append(src)
-

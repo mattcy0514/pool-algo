@@ -2,9 +2,10 @@
 
 import numpy as np
 
-radius = 6.15*2
-length = 254*2
-width = 127*2
+scale = 2
+radius = 6.15 * scale
+length = 127 * scale
+width = 254 * scale
 conf = np.matrix([[length, 0], [0, width]])
 
 e = radius * 0.001

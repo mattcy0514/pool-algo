@@ -9,18 +9,17 @@ import path
 from graphic import Graphic
 import json
 
-graphic = Graphic()
-
 radius = config.radius
 length = config.length
 width = config.width
 
-holes = [Hole(np.matrix([[0], [0]])), Hole(np.matrix([[length/2], [0]])), Hole(np.matrix([[length], [0]]))
-        , Hole(np.matrix([[0], [width]])), Hole(np.matrix([[length/2], [width]])), Hole(np.matrix([[length], [width]]))]
+holes = [Hole(np.matrix([[0], [0]])), Hole(np.matrix([[0], [width/2]])), Hole(np.matrix([[0], [width]]))
+        , Hole(np.matrix([[length], [0]])), Hole(np.matrix([[length], [width/2]])), Hole(np.matrix([[length], [width]]))]
 origin = np.matrix([[0], [0]])
 
 def pool(mball, tballs, cushion_amt, path_amt):
 
+    graphic = Graphic()
     graphic._set_holes(holes, "black")
     graphic._set_mball(mball, "white")
     graphic._set_tballs(tballs, "red")
@@ -77,9 +76,16 @@ def pool(mball, tballs, cushion_amt, path_amt):
             print(path_no, "evaluation", evaluation)
             moving_list = sorted_paths[i][1].moving_list
             graphic._set_moving_list(moving_list)
-            path_json[path_no] = {"evaluation": str(evaluation)},\
-                 {"moving_list": [(str(moving.pos[0,0]), str(moving.pos[1,0])) for moving in moving_list]}
-    return json.dumps(path_json)
+            path_json[path_no] = {"evaluation": str(evaluation),\
+                "moving_list": [(str(moving.pos[0,0]), str(moving.pos[1,0])) for moving in moving_list]}
+    graphic._savefig('pool.png', 1200)
+
+    pool_json = {
+        "mball": [str(mball.pos[0,0]), str(mball.pos[1,0])],
+        "tballs": [(str(tball.pos[0,0]), str(tball.pos[1,0])) for tball in tballs],\
+        "paths": path_json} 
+
+    return json.dumps(pool_json)
 
 
 
