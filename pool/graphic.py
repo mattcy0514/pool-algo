@@ -13,8 +13,6 @@ class Graphic:
         self.ax.set_aspect('equal')
         self._set_lim()
         self._set_facecolor("green")
-        
-        
 
     def _set_lim(self):
         self.ax.set_xlim((0, config.length))
