@@ -7,7 +7,7 @@ radius = 6.15 * scale
 length = 127 * scale
 width = 254 * scale
 conf = np.matrix([[length, 0], [0, width]])
-
+n = 4
 e = radius * 0.001
 
 alpha = 0.8

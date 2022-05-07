@@ -126,7 +126,7 @@ def evaluation(angles, cushion_count, dist):
         angle_evaluation *= math.cos(angle)
     cushion_evaluation = config.alpha ** cushion_count
     diagonal_dist = (config.length ** 2 + config.width ** 2) ** (1/2)
-    dist_evaluation = math.tanh(diagonal_dist / dist)
+    dist_evaluation = (config.n * diagonal_dist - dist) / (config.n * diagonal_dist)
     print("angle", angle_evaluation)
     print("cushion", cushion_evaluation)
     print("dist", dist_evaluation)
